@@ -16,7 +16,6 @@ export const OrderCard = memo(function OrderCard({
 
   // TODO: Взять переменную из стора
   const ingredients: TIngredient[] = useSelector(selectIngredients);
-
   const orderInfo = useMemo(() => {
     if (!ingredients.length) return null;
 
