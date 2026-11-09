@@ -1,26 +1,34 @@
+import { Preloader } from '@/components/ui';
+import { selectUser, updateUser } from '@/services/slices/userSlice';
+import { useDispatch, useSelector } from '@/services/store';
+import type { TRegisterData } from '@/utils/burger-api';
 import { ProfileUI } from '@ui-pages';
 import { type SyntheticEvent, useEffect, useState } from 'react';
 
 export const Profile = (): React.JSX.Element => {
   /** TODO: Взять переменную из стора */
-  const user = {
-    name: '',
-    email: '',
-  };
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   const [formValue, setFormValue] = useState({
-    name: user.name,
-    email: user.email,
+    name: '',
+    email: '',
     password: '',
   });
 
   useEffect(() => {
-    setFormValue((prevState) => ({
-      ...prevState,
-      name: user?.name || '',
-      email: user?.email || '',
-    }));
+    if (user) {
+      setFormValue((prevState) => ({
+        ...prevState,
+        name: user.name || '',
+        email: user.email || '',
+      }));
+    }
   }, [user]);
+
+  if (!user) {
+    return <Preloader />;
+  }
 
   const isFormChanged =
     formValue.name !== user?.name ||
@@ -29,6 +37,30 @@ export const Profile = (): React.JSX.Element => {
 
   const handleSubmit = (e: SyntheticEvent): void => {
     e.preventDefault();
+    const dataToUpdate: Partial<TRegisterData> = {};
+
+    if (formValue.name !== user.name) {
+      dataToUpdate.name = formValue.name;
+    }
+
+    if (formValue.email !== user.email) {
+      dataToUpdate.email = formValue.email;
+    }
+
+    if (formValue.password) {
+      dataToUpdate.password = formValue.password;
+    }
+
+    if (Object.keys(dataToUpdate).length === 0) return;
+
+    void dispatch(updateUser(dataToUpdate))
+      .unwrap()
+      .then(() => {
+        setFormValue((prev) => ({ ...prev, password: '' }));
+      })
+      .catch((error) => {
+        console.log('Ошибка обновления:', error);
+      });
   };
 
   const handleCancel = (e: SyntheticEvent): void => {
