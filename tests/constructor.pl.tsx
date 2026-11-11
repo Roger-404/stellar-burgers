@@ -81,7 +81,7 @@ test.describe('add ingredients to constructor works correctly', function () {
 
     const modal = page.locator('#modals').getByText('идентификатор заказа');
     await expect(modal).toBeVisible();
-    await expect(page.getByText('1017')).toBeVisible();
+    await expect(page.locator('#modals').getByText('1017')).toBeVisible();
 
     await page.getByLabel('Закрыть').click();
     await expect(modal).toBeHidden();
@@ -94,7 +94,7 @@ test.describe('add ingredients to constructor works correctly', function () {
     await page.goto('/');
 
     await page.getByText('Краторная булка N-200i').click();
-    const modal = page.getByText('Детали ингредиента');
+    const modal = page.locator('#modals').getByText('Детали ингредиента');
     await expect(modal).toBeVisible();
 
     await page.getByTestId('modal-overlay').click({
